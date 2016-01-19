@@ -1,4 +1,5 @@
 ﻿using Snifles.Data;
+using System;
 using System.Net;
 
 namespace Snifles.Transport_Layer
@@ -24,6 +25,8 @@ namespace Snifles.Transport_Layer
 
         public readonly ushort Window;
         public readonly ushort UrgentPointer;
+        public readonly byte[][] Options;
+        public readonly byte[] Data;
 
         public TcpHeader(byte[] byIpData, int start)
         {
@@ -50,7 +53,35 @@ namespace Snifles.Transport_Layer
             Checksum = br.ReadUInt16();
             UrgentPointer = br.ReadUInt16();
 
-            //TODO: finish
+            //TODO: test
+            byte option;
+            long optionsStart = br.BaseStream.Position;
+            Options = new byte[0][];
+
+            while ((option = br.ReadByte()) != 0 || br.BaseStream.Position > start + DataOffset)    // 0 = End list
+            {
+                if (option == 1) continue;  // 1 = No Option
+                if (option == 2)            // Max Segm size
+                {
+                    byte length = br.ReadByte();
+
+                    byte[] cur = new byte[length];
+                    for (byte i = 0; i < length; i++)
+                    {
+                        cur[i] = br.ReadByte();
+                    }
+
+                    Array.Resize(ref Options, Options.Length + 1);
+                    Options[Options.Length - 1] = cur;
+                }
+            }
+
+            long dataLength = DataOffset - optionsStart;
+            Data = new byte[dataLength];
+            for (int i = 0; i < dataLength; i++)
+            {
+                Data[i] = br.ReadByte();
+            }
         }
     }
 }
