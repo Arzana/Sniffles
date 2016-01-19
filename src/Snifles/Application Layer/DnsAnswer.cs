@@ -20,34 +20,7 @@ namespace Snifles.Application_Layer
 
         public DnsAnswer(NetBinaryReader br)
         {
-            long currentPos = -1;
-            ushort aName = (ushort)IPAddress.NetworkToHostOrder(br.ReadInt16());
-            if ((aName & 0xC000) == 0xC000) // Pointer
-            {
-                ushort offset = (ushort)(aName & 0x3FFF);
-                currentPos = br.BaseStream.Position;
-                br.BaseStream.Position = offset - DnsHeader.BYTE_COUNT;
-            }
-            else br.BaseStream.Position -= 2;
-
-            List<string> labels = new List<string>();
-            byte nameLength;
-
-            while ((nameLength = br.ReadByte()) != 0)
-            {
-                string label = string.Empty;
-
-                for (int i = 0; i < nameLength; i++)
-                {
-                    label += (char)br.ReadByte();
-                }
-
-                labels.Add(label);
-            }
-
-            if (currentPos != -1) br.BaseStream.Position = currentPos;
-            Name = string.Join(".", labels);
-
+            Name = GetName(br);
             Type = (QType)(ushort)IPAddress.NetworkToHostOrder(br.ReadInt16());
 
             ushort rawClass = (ushort)IPAddress.NetworkToHostOrder(br.ReadInt16());
@@ -63,6 +36,42 @@ namespace Snifles.Application_Layer
             for (int i = 0; i < ByteCount; i++)
             {
                 RData[i] = br.ReadByte();
+            }
+        }
+
+        private string GetName(NetBinaryReader nbr)
+        {
+            ushort aName = (ushort)IPAddress.NetworkToHostOrder(nbr.ReadInt16());
+            if ((aName & 0xC000) == 0xC000) // Pointer
+            {
+                ushort offset = (ushort)(aName & 0x3FFF);
+                long currentPos = nbr.BaseStream.Position;
+                nbr.BaseStream.Position = offset - DnsHeader.BYTE_COUNT;
+
+                string name = GetName(nbr);
+                nbr.BaseStream.Position = currentPos;
+                return name;
+            }
+            else
+            {
+                nbr.BaseStream.Position -= 2;
+
+                List<string> labels = new List<string>();
+                byte nameLength;
+
+                while ((nameLength = nbr.ReadByte()) != 0)
+                {
+                    string label = string.Empty;
+
+                    for (int i = 0; i < nameLength; i++)
+                    {
+                        label += (char)nbr.ReadByte();
+                    }
+
+                    labels.Add(label);
+                }
+
+                return string.Join(".", labels);
             }
         }
     }

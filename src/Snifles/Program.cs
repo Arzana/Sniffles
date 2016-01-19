@@ -32,10 +32,15 @@ namespace Snifles
             {
                 if ((packet.TransportHeader as UdpHeader).IsDns)
                 {
-                    DnsPacket dns = new DnsPacket(packet);
-                    for (int i = 0; i < dns.Questions.Length; i++)
+                    if (!debug)
                     {
-                        Write(dns.Questions[i].QueriedDomainName);
+                        debug = true;
+                        DnsPacket dns = new DnsPacket(packet);
+                        for (int i = 0; i < dns.Questions.Length; i++)
+                        {
+                            Write(dns.Questions[i].QueriedDomainName);
+                        }
+                        debug = false;
                     }
                 }
                 else Write($"UDP: {(packet.TransportHeader as UdpHeader).ByteCount}");
