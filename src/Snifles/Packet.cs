@@ -16,8 +16,11 @@ namespace Snifles
         public readonly ProtocolHeader TransportHeader;
         public readonly object ApplicationHeader;
 
+        private readonly byte[] rawData;
+
         public Packet(byte[] raw, int byteCount)
         {
+            rawData = raw;
             IpHeader = new IPHeader(raw, byteCount);
 
             byte byHeaderLength = (byte)(IpHeader.Version + IpHeader.HeaderLength);
