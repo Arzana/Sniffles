@@ -1,6 +1,5 @@
 ﻿using Snifles.Data;
 using System;
-using System.Net;
 
 namespace Snifles.Transport_Layer
 {
@@ -30,45 +29,45 @@ namespace Snifles.Transport_Layer
 
         public TcpHeader(byte[] byIpData, int start)
         {
-            NetBinaryReader br = new NetBinaryReader(byIpData, start);
+            NetBinaryReader nbr = new NetBinaryReader(byIpData, start);
 
-            SourcePort = (ushort)IPAddress.NetworkToHostOrder(br.ReadInt16());
-            DestinationPort = (ushort)IPAddress.NetworkToHostOrder(br.ReadInt16());
+            SourcePort = nbr.ReadUInt16();
+            DestinationPort = nbr.ReadUInt16();
 
-            SequenceNumber = br.ReadUInt32();
-            AcknowledgmentNumber = br.ReadUInt32();
+            SequenceNumber = nbr.ReadUInt32();
+            AcknowledgmentNumber = nbr.ReadUInt32();
 
-            DataOffset = br.ReadNible();
-            br.SkipPadBits();
+            DataOffset = nbr.ReadNible();
+            nbr.SkipPadBits();
 
-            br.ReadCustomAmount(2);
-            URG = br.ReadBit();
-            ACK = br.ReadBit();
-            PSH = br.ReadBit();
-            RST = br.ReadBit();
-            SYN = br.ReadBit();
-            FIN = br.ReadBit();
+            nbr.ReadCustomAmount(2);
+            URG = nbr.ReadBit();
+            ACK = nbr.ReadBit();
+            PSH = nbr.ReadBit();
+            RST = nbr.ReadBit();
+            SYN = nbr.ReadBit();
+            FIN = nbr.ReadBit();
 
-            Window = br.ReadUInt16();
-            Checksum = br.ReadUInt16();
-            UrgentPointer = br.ReadUInt16();
+            Window = nbr.ReadUInt16();
+            Checksum = nbr.ReadUInt16();
+            UrgentPointer = nbr.ReadUInt16();
 
             //TODO: test
             byte option;
-            long optionsStart = br.BaseStream.Position;
+            long optionsStart = nbr.BaseStream.Position;
             Options = new byte[0][];
 
-            while ((option = br.ReadByte()) != 0 || br.BaseStream.Position > start + DataOffset)    // 0 = End list
+            while ((option = nbr.ReadByte()) != 0 || nbr.BaseStream.Position > start + DataOffset)    // 0 = End list
             {
                 if (option == 1) continue;  // 1 = No Option
                 if (option == 2)            // Max Segm size
                 {
-                    byte length = br.ReadByte();
+                    byte length = nbr.ReadByte();
 
                     byte[] cur = new byte[length];
                     for (byte i = 0; i < length; i++)
                     {
-                        cur[i] = br.ReadByte();
+                        cur[i] = nbr.ReadByte();
                     }
 
                     Array.Resize(ref Options, Options.Length + 1);
@@ -80,7 +79,7 @@ namespace Snifles.Transport_Layer
             Data = new byte[dataLength];
             for (int i = 0; i < dataLength; i++)
             {
-                Data[i] = br.ReadByte();
+                Data[i] = nbr.ReadByte();
             }
         }
     }

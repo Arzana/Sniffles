@@ -1,36 +1,31 @@
 ﻿using Snifles.Data;
 using System;
-using System.Net;
 
 namespace Snifles.Transport_Layer
 {
     public sealed class UdpHeader : ProtocolHeader
     {
+        public const int OCTET_COUNT = 8;
         public bool IsDns { get { return SourcePort == 53 || DestinationPort == 53; } }
 
         public readonly ushort SourcePort;
         public readonly ushort DestinationPort;
 
         public readonly ushort ByteCount;
-
-        public readonly byte[] raw;
         public readonly byte[] data;
 
         public UdpHeader(byte[] byIpData, int start, int bytesReceived)
         {
-            NetBinaryReader br = new NetBinaryReader(byIpData, start);
+            NetBinaryReader nbr = new NetBinaryReader(byIpData, start);
 
-            SourcePort = (ushort)IPAddress.NetworkToHostOrder(br.ReadInt16());
-            DestinationPort = (ushort)IPAddress.NetworkToHostOrder(br.ReadInt16());
+            SourcePort = nbr.ReadUInt16();
+            DestinationPort = nbr.ReadUInt16();
 
-            ByteCount = (ushort)IPAddress.NetworkToHostOrder(br.ReadInt16());
-            Checksum = (ushort)IPAddress.NetworkToHostOrder(br.ReadInt16());
+            ByteCount = nbr.ReadUInt16();
+            Checksum = nbr.ReadUInt16();
 
-            raw = new byte[8];
-            Array.Copy(byIpData, start, raw, 0, raw.Length);
-
-            data = new byte[ByteCount - raw.Length];
-            Array.Copy(byIpData, start + raw.Length, data, 0, data.Length);
+            data = new byte[ByteCount - OCTET_COUNT];
+            Array.Copy(byIpData, start + OCTET_COUNT, data, 0, data.Length);
         }
     }
 }

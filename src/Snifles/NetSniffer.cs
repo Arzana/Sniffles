@@ -17,23 +17,17 @@ namespace Snifles
         private static byte[] buffer;
         private static bool working;
 
-        public static void Sniff(IPAddress address = null, int port = 0)
+        public static void Sniff(int port = 0)
         {
-            if (address == null)
-            {
-                IPHostEntry entry = Dns.GetHostEntry(Dns.GetHostName());
-                address = entry.AddressList.First(a => a.AddressFamily == AddressFamily.InterNetwork);
-            }
-            IPEndPoint localEP = new IPEndPoint(address, port);
-
+            IPEndPoint localEP = GetLocalEndPort(port);
             socket = new Socket(AddressFamily.InterNetwork, SocketType.Raw, ProtocolType.IP);
-            socket.Bind(localEP);
+
+            if (!TryBindSocket(localEP)) return;
 
             socket.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.HeaderIncluded, true);
 
             byte[] byTrue = new byte[4] { 1, 0, 0, 0 };
-            byte[] byOut = new byte[4];
-            socket.IOControl(IOControlCode.ReceiveAll, byTrue, byOut);
+            socket.IOControl(IOControlCode.ReceiveAll, byTrue, null);
 
             buffer = new byte[4096];
             working = true;
@@ -62,6 +56,29 @@ namespace Snifles
             else working = false;
 
             if (OnReceive != null) OnReceive.Invoke(p);
+        }
+
+        private static IPEndPoint GetLocalEndPort(int port)
+        {
+            IPHostEntry entry = Dns.GetHostEntry(Dns.GetHostName());
+            IPAddress address = entry.AddressList.First(a => a.AddressFamily == AddressFamily.InterNetwork);
+            return new IPEndPoint(address, port);
+        }
+
+        private static bool TryBindSocket(IPEndPoint endPnt)
+        {
+            try
+            {
+                socket.Bind(endPnt);
+                return true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Could not bind socket!");
+                Console.WriteLine("Exception:");
+                Console.WriteLine(e.Message);
+                return false;
+            }
         }
     }
 }

@@ -14,7 +14,7 @@ namespace Snifles
 {
     public static class Program
     {
-        static bool debug;
+        private static bool debug;
 
         public static void Main(string[] args)
         {
@@ -32,16 +32,14 @@ namespace Snifles
             {
                 if ((packet.TransportHeader as UdpHeader).IsDns)
                 {
-                    if (!debug)
+                    RunInDebug(() =>
                     {
-                        debug = true;
                         DnsPacket dns = new DnsPacket(packet);
                         for (int i = 0; i < dns.Questions.Length; i++)
                         {
                             Write(dns.Questions[i].QueriedDomainName);
                         }
-                        debug = false;
-                    }
+                    });
                 }
                 else Write($"UDP: {(packet.TransportHeader as UdpHeader).ByteCount}");
             }
@@ -57,6 +55,21 @@ namespace Snifles
         private static void Write(string msg)
         {
             Console.WriteLine($"[{DateTime.Now.ToString("hh:mm:ss")}] - {msg}");
+        }
+
+        private static void Write(object obj)
+        {
+            Write(obj.ToString());
+        }
+
+        private static void RunInDebug(Action action)
+        {
+            if (!debug)
+            {
+                debug = true;
+                action.Invoke();
+                debug = false;
+            }
         }
     }
 }

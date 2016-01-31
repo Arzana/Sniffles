@@ -23,25 +23,20 @@ namespace Snifles
             rawData = raw;
             IpHeader = new IPHeader(raw, byteCount);
 
-            byte byHeaderLength = (byte)(IpHeader.Version + IpHeader.HeaderLength);
-            byHeaderLength <<= 4;
-            byHeaderLength >>= 4;
-            byHeaderLength *= 4;
-
             switch (Protocol)
             {
                 case (ProtocolType.Udp):
-                    UdpHeader udpHeader = new UdpHeader(raw, byHeaderLength, byteCount);
+                    UdpHeader udpHeader = new UdpHeader(raw, IPHeader.OCTET_COUNT, byteCount);
                     TransportHeader = udpHeader;
 
-                    if (udpHeader.IsDns) ApplicationHeader = new DnsHeader(raw, byHeaderLength + udpHeader.raw.Length, byteCount);
+                    if (udpHeader.IsDns) ApplicationHeader = new DnsHeader(raw, IPHeader.OCTET_COUNT + UdpHeader.OCTET_COUNT, byteCount);
                     break;
                 case (ProtocolType.Tcp):
-                    TcpHeader tcpHeader = new TcpHeader(raw, byHeaderLength);
+                    TcpHeader tcpHeader = new TcpHeader(raw, IPHeader.OCTET_COUNT);
                     TransportHeader = tcpHeader;
                     break;
                 case (ProtocolType.Icmp):
-                    IcmpHeader icmpHeader = new IcmpHeader(raw, byHeaderLength, byteCount);
+                    IcmpHeader icmpHeader = new IcmpHeader(raw, IPHeader.OCTET_COUNT, byteCount);
                     TransportHeader = icmpHeader;
                     break;
             }

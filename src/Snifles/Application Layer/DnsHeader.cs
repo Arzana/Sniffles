@@ -1,12 +1,11 @@
 ﻿using Snifles.Data;
 using System;
-using System.Net;
 
 namespace Snifles.Application_Layer
 {
     public sealed class DnsHeader
     {
-        public const int BYTE_COUNT = 12;
+        public const int OCTET_COUNT = 12;
 
         public readonly ushort Indentifier;
 
@@ -25,35 +24,31 @@ namespace Snifles.Application_Layer
         public readonly ushort AuthorityCount;
         public readonly ushort AdditionalCount;
 
-        public readonly byte[] raw;
         public readonly byte[] data;
 
         public DnsHeader(byte[] byIpData, int start, int bytesReceived)
         {
-            NetBinaryReader br = new NetBinaryReader(byIpData, start);
+            NetBinaryReader nbr = new NetBinaryReader(byIpData, start);
 
-            Indentifier = (ushort)IPAddress.NetworkToHostOrder(br.ReadInt16());
+            Indentifier = nbr.ReadUInt16();
 
-            QueryOrResponseFlag = br.ReadBit();
-            OperationCode = (OpCode)br.ReadNible();
-            AuthoritativeAnswer = br.ReadBit();
-            Turncation = br.ReadBit();
-            RecursionDesired = br.ReadBit();
+            QueryOrResponseFlag = nbr.ReadBit();
+            OperationCode = (OpCode)nbr.ReadNible();
+            AuthoritativeAnswer = nbr.ReadBit();
+            Turncation = nbr.ReadBit();
+            RecursionDesired = nbr.ReadBit();
 
-            RecursionAvailable = br.ReadBit();
-            br.ReadCustomAmount(3);
-            ResponseCode = (RCode)br.ReadNible();
+            RecursionAvailable = nbr.ReadBit();
+            nbr.ReadCustomAmount(3);
+            ResponseCode = (RCode)nbr.ReadNible();
 
-            QuestionCount = (ushort)IPAddress.NetworkToHostOrder(br.ReadInt16());
-            AnswerCount = (ushort)IPAddress.NetworkToHostOrder(br.ReadInt16());
-            AuthorityCount = (ushort)IPAddress.NetworkToHostOrder(br.ReadInt16());
-            AdditionalCount = (ushort)IPAddress.NetworkToHostOrder(br.ReadInt16());
+            QuestionCount = nbr.ReadUInt16();
+            AnswerCount = nbr.ReadUInt16();
+            AuthorityCount = nbr.ReadUInt16();
+            AdditionalCount = nbr.ReadUInt16();
 
-            raw = new byte[BYTE_COUNT];
-            Array.Copy(byIpData, start, raw, 0, raw.Length);
-
-            data = new byte[bytesReceived - start - raw.Length];
-            Array.Copy(byIpData, start + raw.Length, data, 0, data.Length);
+            data = new byte[bytesReceived - start - OCTET_COUNT];
+            Array.Copy(byIpData, start + OCTET_COUNT, data, 0, data.Length);
         }
     }
 }

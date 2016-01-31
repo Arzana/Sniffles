@@ -6,6 +6,8 @@ namespace Snifles.Internet_Layer
 {
     public sealed class IPHeader
     {
+        public const int OCTET_COUNT = 20;
+
         public readonly int Version;
         public readonly int HeaderLength;
 
@@ -30,31 +32,31 @@ namespace Snifles.Internet_Layer
 
         public IPHeader(byte[] byBuffer, int nReceived)
         {
-            NetBinaryReader br = new NetBinaryReader(byBuffer, 0, nReceived);
+            NetBinaryReader nbr = new NetBinaryReader(byBuffer, 0, nReceived);
 
-            Version = br.ReadNible();
-            HeaderLength = br.ReadNible();
+            Version = nbr.ReadNible();
+            HeaderLength = nbr.ReadNible();
 
-            Precedence = (Precedence)br.ReadCustomAmount(3);
-            LowDelay = br.ReadBit();
-            HighThroughput = br.ReadBit();
-            HighRelibility = br.ReadBit();
-            br.SkipPadBits();
+            Precedence = (Precedence)nbr.ReadCustomAmount(3);
+            LowDelay = nbr.ReadBit();
+            HighThroughput = nbr.ReadBit();
+            HighRelibility = nbr.ReadBit();
+            nbr.SkipPadBits();
 
-            TotalLength = (ushort)IPAddress.NetworkToHostOrder(br.ReadInt16());
-            Identification = (ushort)IPAddress.NetworkToHostOrder(br.ReadInt16());
+            TotalLength = nbr.ReadUInt16();
+            Identification = nbr.ReadUInt16();
 
-            br.ReadBit();
-            MayFragment = !br.ReadBit();
-            LastFragment = !br.ReadBit();
-            FragmentOffset = (br.ReadPadBits() << 3) + br.ReadByte();
+            nbr.ReadBit();
+            MayFragment = !nbr.ReadBit();
+            LastFragment = !nbr.ReadBit();
+            FragmentOffset = (nbr.ReadPadBits() << 3) + nbr.ReadByte();
 
-            TTL = br.ReadByte();
-            Protocol = (ProtocolType)br.ReadByte();
-            HeaderChecksum = IPAddress.NetworkToHostOrder(br.ReadInt16());
+            TTL = nbr.ReadByte();
+            Protocol = (ProtocolType)nbr.ReadByte();
+            HeaderChecksum = IPAddress.NetworkToHostOrder(nbr.ReadInt16());
 
-            Source = new IPAddress((uint)br.ReadInt32());
-            Destination = new IPAddress((uint)br.ReadInt32());
+            Source = new IPAddress(nbr.ReadBytes(4));
+            Destination = new IPAddress(nbr.ReadBytes(4));
         }
     }
 }

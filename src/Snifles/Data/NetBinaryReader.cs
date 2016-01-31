@@ -1,5 +1,8 @@
-﻿using System;
+﻿using Snifles.Application_Layer;
+using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Net;
 
 namespace Snifles.Data
 {
@@ -19,6 +22,60 @@ namespace Snifles.Data
         public NetBinaryReader(byte[] data, int index, int length)
             : base(new MemoryStream(data, index, length))
         { }
+
+        new public ushort ReadUInt16()
+        {
+            return (ushort)IPAddress.NetworkToHostOrder(ReadInt16());
+        }
+
+        new public uint ReadUInt32()
+        {
+            return (uint)IPAddress.NetworkToHostOrder(ReadInt32());
+        }
+
+        new public ulong ReadUInt64()
+        {
+            return (ulong)IPAddress.NetworkToHostOrder(ReadInt64());
+        }
+
+        public string ReadLblOrPntString()
+        {
+            ushort aName = ReadUInt16();
+
+            if (IsPointer(aName)) return GetPointerName(aName);
+            else
+            {
+                BaseStream.Position -= 2;
+
+                List<string> labels = new List<string>();
+                byte nameLength;
+
+                while ((nameLength = ReadByte()) != 0)
+                {
+                    BaseStream.Position -= 1;
+                    aName = ReadUInt16();
+
+                    if (IsPointer(aName))
+                    {
+                        labels.Add(GetPointerName(aName));
+                        BaseStream.Position++;
+                        break;
+                    }
+
+                    BaseStream.Position -= 1;
+                    string label = string.Empty;
+
+                    for (int i = 0; i < nameLength; i++)
+                    {
+                        label += (char)ReadByte();
+                    }
+
+                    labels.Add(label);
+                }
+
+                return string.Join(".", labels);
+            }
+        }
 
         public bool ReadBit()
         {
@@ -61,6 +118,22 @@ namespace Snifles.Data
         {
             padByte = 0;
             bitPosition = 0;
+        }
+
+        private string GetPointerName(ushort pointer)
+        {
+            ushort offset = (ushort)(pointer & 0x3FFF);
+            long currentPos = BaseStream.Position;
+            BaseStream.Position = offset - DnsHeader.OCTET_COUNT;
+
+            string name = ReadLblOrPntString();
+            BaseStream.Position = currentPos;
+            return name;
+        }
+
+        private bool IsPointer(ushort aName)
+        {
+            return (aName & 0xC000) == 0xC000;
         }
 
         private byte GetBitMask()
