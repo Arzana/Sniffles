@@ -4,7 +4,7 @@ using System.Diagnostics;
 
 namespace Snifles.Application_Layer
 {
-    [DebuggerDisplay("{Type} To {QueriedDomainName}")]
+    [DebuggerDisplay("{ToString()}")]
     public sealed class DnsQuestion
     {
         public int ByteCount { get { return 5 + QueriedDomainName.Length; } }
@@ -38,6 +38,11 @@ namespace Snifles.Application_Layer
             else if (rawClass > 4 && rawClass < 252) rawClass = 2;
             else if (rawClass > 255 && rawClass < 65280) rawClass = 2;
             Class = (DnsClass)rawClass;
+        }
+
+        public override string ToString()
+        {
+            return $"{Type} To {QueriedDomainName}";
         }
     }
 }

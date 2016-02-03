@@ -1,8 +1,10 @@
 ﻿using Snifles.Data;
 using System;
+using System.Diagnostics;
 
 namespace Snifles.Application_Layer
 {
+    [DebuggerDisplay("QC: {Header.QuestionCount} AC: {Header.AnswerCount}")]
     public sealed class DnsPacket
     {
         public readonly DnsHeader Header;

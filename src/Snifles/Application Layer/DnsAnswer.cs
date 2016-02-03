@@ -4,11 +4,10 @@ using System.Net;
 
 namespace Snifles.Application_Layer
 {
-    [DebuggerDisplay("{Name}")]
+    [DebuggerDisplay("{ToString()}")]
     public sealed class DnsAnswer
     {
         public bool Cache { get { return TTL != 0; } }
-        public IPAddress A { get { return recordValue as IPAddress; } }
 
         public readonly string Name;
         public readonly QType Type;
@@ -35,17 +34,40 @@ namespace Snifles.Application_Layer
             HandleRData(nbr);
         }
 
+        public override string ToString()
+        {
+            return $"{Type} From {Name}";
+        }
+
         private void HandleRData(NetBinaryReader nbr)
         {
+            long startPos = nbr.BaseStream.Position;
+
             switch (Type)
             {
                 case (QType.A):
+                case (QType.AAAA):
                     recordValue = new IPAddress(nbr.ReadBytes(ByteCount));
+                    break;
+                case (QType.NS):
+                case (QType.CNAME):
+                    recordValue = nbr.ReadLblOrPntString();
+                    ReadPadOctets(nbr, startPos);
+                    break;
+                case (QType.SOA):
+                    recordValue = new SOA(nbr);
+                    ReadPadOctets(nbr, startPos);
                     break;
                 default:
                     recordValue = nbr.ReadBytes(ByteCount);
                     break;
             }
+        }
+
+        private void ReadPadOctets(NetBinaryReader nbr, long startPos)
+        {
+            long padding = ByteCount - (nbr.BaseStream.Position - startPos);
+            nbr.BaseStream.Position += padding;
         }
     }
 }
