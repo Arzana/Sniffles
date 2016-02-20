@@ -1,10 +1,9 @@
 #pragma once
 
+#include <conio.h>
 #include "Utils.h"
 #include "SockInit.h"
 #include "NetHeaders.h"
-
-#pragma comment(lib, "ws2_32.lib")
 
 #define PACK_SIZE 65536
 

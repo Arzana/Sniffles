@@ -1,46 +1,48 @@
 #include "Main.h"
 
-SOCKET sock;
-
-
 int main(int argc, const char *argv[])
 {
-	octet *buffer = malloc(PACK_SIZE);
-	int bufflen;
-	if (!InitNet(&sock))
+	StartWriteData();
+	char *buffer = malloc(PACK_SIZE);
+	int bufflen, result = 0;
+	if (InitNet())
 	{
-		printf("Failed to initialize WinSock!\n");
-		goto Failed;
+		WriteData("Failed to initialize WinSock!\n");
+		result = -1;
+		goto End;
 	}
 
+	WriteData("***********************Started sniffing***********************\n");
+	printf("Press any key to exit at next message.\n");
 	while (1)
 	{
-		bufflen = recv(sock, buffer, PACK_SIZE, 0);
+		bufflen = recvfrom(sniffer, buffer, 65536, 0, 0, 0); //recv(sniffer, buffer, PACK_SIZE, 0);
 		if (bufflen < 0)
 		{
-			printf("Recv error at get packets: %d.\n", WSAGetLastError());
-			goto Failed;
+			WriteData("Recv error at get packets: %d.\n", WSAGetLastError());
+			result = -1;
+			goto End;
 		}
 
 		ProcessPacket(buffer, bufflen);
+
+		if (kbhit()) break;
 	}
 
-	closesocket(sock);
-	printf("Finished.\n");
+	closesocket(sniffer);
+	WriteData("\n***********************Finished***********************\n");
 
-	getchar();
+End:
 	free(buffer);
-	return 0;
-
-Failed:
-	getchar();
-	free(buffer);
-	return -1;
+	EndWriteData();
+	WSACleanup();
+	return result;
 }
 
 void ProcessPacket(octet *buff, int len)
 {
 	IPV4_HDR *iphdr = buff;
+	WriteIPv4Hdr(iphdr);
 
 	switch (iphdr->proto)
 	{
@@ -55,7 +57,7 @@ void ProcessPacket(octet *buff, int len)
 		ProcessUDP(buff);
 		break;
 	default:
-		printf("%d\n", iphdr->proto);
+		WriteData("%d\n", iphdr->proto);
 		break;
 	}
 }
@@ -63,7 +65,9 @@ void ProcessPacket(octet *buff, int len)
 void ProcessUDP(octet *buff)
 {
 	UDP_HDR *udphdr = IP_DATA_START(buff);
-	printf("UDP\n");
+
+	if (ntohs(udphdr->destPort) == 53 || ntohs(udphdr->srcPort) == 53) WriteData("DNS (UDP)\n");
+	else WriteData("UDP\n");
 }
 
 void ProcessICMP(octet *buff)
@@ -179,5 +183,5 @@ void ProcessICMP(octet *buff)
 		break;
 	}
 
-	printf("ICMP - %s\n", type);
+	WriteData("ICMP - %s\n", type);
 }

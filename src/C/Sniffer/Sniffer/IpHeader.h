@@ -15,6 +15,8 @@ typedef struct IpHdr
 	octet dontFragment : 1;
 	octet reserved_zero : 1;
 
+	octet ip_frag_offset1;
+
 	octet ttl;
 	octet proto;
 	wyde checksum;
@@ -23,3 +25,5 @@ typedef struct IpHdr
 	uint destAddr;
 
 } IPV4_HDR;
+
+void WriteIPv4Hdr(IPV4_HDR*);

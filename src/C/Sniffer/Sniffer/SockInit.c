@@ -1,92 +1,74 @@
 #include "SockInit.h"
 
-int InitNet(SOCKET* s)
+int InitNet(void)
 {
-	WSADATA *wsa;
-	if (!(wsa = InitWinSock())) return 0;
+	struct in_addr addr;
+	int in, i, j;
 
-	if ((*s = GetSocket()) == INVALID_SOCKET) return 0;
-
-	SOCKADDR_IN *sa;
-	if (!(sa = GetSocketAddr())) return 0;
-
-	if (!Bind(*s, sa)) return 0;
-
-	return SetPromiscuous(*s);
-}
-
-WSADATA* InitWinSock(void)
-{
+	char hostname[100];
+	struct hostent *local;
 	WSADATA wsa;
+
+	printf("Initializing Winsock...");
 	if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
 	{
-		printf("Failed.\nError Code: %d\n", WSAGetLastError());
-		return NULL;
+		printf("WSAStartup() failed (%d).\n", WSAGetLastError());
+		return 1;
 	}
-	else printf("Initialised WinSock.\n");
+	printf("Initialized.");
 
-	return &wsa;
-}
-
-SOCKET GetSocket(void)
-{
-	SOCKET s;
-	if ((s = socket(AF_INET, SOCK_RAW, IPPROTO_IP)) == INVALID_SOCKET)
+	printf("\nCreating RAW Socket...");
+	if ((sniffer = socket(AF_INET, SOCK_RAW, IPPROTO_IP)) == INVALID_SOCKET)
 	{
-		printf("Could not create socket %d\n", WSAGetLastError());
+		printf("Failed to create raw socket (%d).\n", WSAGetLastError());
+		return 1;
 	}
-	else printf("Socket created.\n");
+	printf("Created");
 
-	return s;
-}
-
-SOCKADDR_IN* GetSocketAddr(void)
-{
-	char hostName[HOSTNAME_LEN];
-	if (gethostname(hostName, HOSTNAME_LEN) == SOCKET_ERROR)
+	if (gethostname(hostname, sizeof(hostname)) == SOCKET_ERROR)
 	{
-		printf("Unable to get host name: %d\n", WSAGetLastError());
-		return NULL;
+		printf("\nError: %d.", WSAGetLastError());
+		return 1;
 	}
+	printf("\nHost name: %s.\n", hostname);
 
-	struct hostent *h;
-	if ((h = gethostbyname(hostName)) == NULL)
+	local = gethostbyname(hostname);
+	printf("\nAvailable Network Interfaces:\n");
+	if (local == NULL)
 	{
-		printf("Unable to get host: %d", WSAGetLastError());
-		return NULL;
+		printf("Error: %d.", WSAGetLastError());
+		return 1;
 	}
 
-	printf("Host address found.\n");
-
-	SOCKADDR_IN sa;
-	sa.sin_family = AF_INET;
-	sa.sin_port = 0;
-	memcpy(&sa.sin_addr.S_un.S_addr, h->h_addr_list[0], h->h_length);
-
-	return &sa;
-}
-
-int Bind(SOCKET s, SOCKADDR_IN *sa)
-{
-	if (bind(s, (SOCKADDR*)sa, sizeof(*sa)) == SOCKET_ERROR)
+	for (i = 0; i < local->h_addr_list[i] != 0; ++i)
 	{
-		printf("Unable to bind socket: %d\n", WSAGetLastError());
-		return 0;
+		memcpy(&addr, local->h_addr_list[i], sizeof(struct in_addr));
+		printf("%d - %s\n", i, inet_ntoa(addr));
 	}
 
-	printf("Bound socket.\n");
-	return 1;
-}
+	printf("Enter the interface number you whould like to sniff: ");
+	scanf("%d", &in);
 
-int SetPromiscuous(SOCKET s)
-{
-	uint opt = 1;
-	int bytes;
-	if (WSAIoctl(s, SIO_RCVALL, &opt, sizeof(opt), NULL, 0, (LPDWORD)&bytes, NULL, NULL) == SOCKET_ERROR)
+	memset(&dest, 0, sizeof(dest));
+	memcpy(&dest.sin_addr.s_addr, local->h_addr_list[in], sizeof(dest.sin_addr.s_addr));
+	dest.sin_family = AF_INET;
+	dest.sin_port = 0;
+
+	printf("Binding socket to local system and port 0...");
+	if (bind(sniffer, (struct sockaddr*)&dest, sizeof(dest)) == SOCKET_ERROR)
 	{
-		printf("Failed to set promiscuous mode: %d\n", WSAGetLastError());
-		return 0;
+		printf("bind(%s) failed (%d).\n", inet_ntoa(addr), WSAGetLastError());
+		return 1;
 	}
+	printf("Binding successful.");
 
-	return 1;
+	j = 1;
+	printf("\nSetting socket to promiscious mode...");
+	if (WSAIoctl(sniffer, SIO_RCVALL, &j, sizeof(j), 0, 0, (LPDWORD)&in, 0, 0) == SOCKET_ERROR)
+	{
+		printf("WSAIoctl() failed (%d).\n", WSAGetLastError());
+		return 1;
+	}
+	printf("Socket set\n\n");
+	return 0;
 }

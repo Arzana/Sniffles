@@ -47,5 +47,8 @@
     <ClCompile Include="SockInit.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="IpHeader.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

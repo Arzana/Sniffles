@@ -28,6 +28,7 @@
     <ClInclude Include="Utils.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="IpHeader.c" />
     <ClCompile Include="Main.c" />
     <ClCompile Include="SockInit.c" />
     <ClCompile Include="Utils.c" />
