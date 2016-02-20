@@ -49,6 +49,7 @@ namespace Snifles.Application_Layer
                 case (QType.AAAA):
                     recordValue = new IPAddress(nbr.ReadBytes(ByteCount));
                     break;
+                    /*
                 case (QType.NS):
                 case (QType.CNAME):
                     recordValue = nbr.ReadLblOrPntString();
@@ -58,6 +59,7 @@ namespace Snifles.Application_Layer
                     recordValue = new SOA(nbr);
                     ReadPadOctets(nbr, startPos);
                     break;
+                    */
                 default:
                     recordValue = nbr.ReadBytes(ByteCount);
                     break;
