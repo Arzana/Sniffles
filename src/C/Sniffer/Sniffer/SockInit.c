@@ -60,7 +60,7 @@ SOCKADDR_IN* GetSocketAddr(void)
 
 	SOCKADDR_IN sa;
 	sa.sin_family = AF_INET;
-	sa.sin_port = htons(6000);
+	sa.sin_port = 0;
 	memcpy(&sa.sin_addr.S_un.S_addr, h->h_addr_list[0], h->h_length);
 
 	return &sa;
@@ -81,8 +81,8 @@ int Bind(SOCKET s, SOCKADDR_IN *sa)
 int SetPromiscuous(SOCKET s)
 {
 	uint opt = 1;
-	DWORD bytes;
-	if (WSAIoctl(s, SIO_RCVALL, &opt, sizeof(opt), NULL, 0, &bytes, NULL, NULL) == SOCKET_ERROR)
+	int bytes;
+	if (WSAIoctl(s, SIO_RCVALL, &opt, sizeof(opt), NULL, 0, (LPDWORD)&bytes, NULL, NULL) == SOCKET_ERROR)
 	{
 		printf("Failed to set promiscuous mode: %d\n", WSAGetLastError());
 		return 0;

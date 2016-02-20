@@ -19,9 +19,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="IcmpHeader.h" />
     <ClInclude Include="IpHeader.h" />
     <ClInclude Include="Main.h" />
+    <ClInclude Include="NetHeaders.h" />
     <ClInclude Include="SockInit.h" />
+    <ClInclude Include="UdpHeader.h" />
     <ClInclude Include="Utils.h" />
   </ItemGroup>
   <ItemGroup>

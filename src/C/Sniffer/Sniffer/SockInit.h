@@ -1,10 +1,10 @@
 #pragma once
 
 #include <WinSock2.h>
-#include <mstcpip.h>
 #include "Utils.h"
 
-#define HOSTNAME_LEN  1024
+#define HOSTNAME_LEN 1024
+#define SIO_RCVALL _WSAIOW(IOC_VENDOR, 1)
 
 WSADATA* InitWinSock(void);
 SOCKET GetSocket(void);

@@ -27,6 +27,15 @@
     <ClInclude Include="IpHeader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="UdpHeader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IcmpHeader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NetHeaders.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.c">
