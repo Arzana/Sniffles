@@ -12,21 +12,19 @@ int main(int argc, const char *argv[])
 		goto End;
 	}
 
-	WriteData("***********************Started sniffing***********************\n");
+	WriteData("\n***********************Started sniffing***********************\n");
 	printf("Press any key to exit at next message.\n");
-	while (1)
+	while (!kbhit())
 	{
-		bufflen = recvfrom(sniffer, buffer, 65536, 0, 0, 0); //recv(sniffer, buffer, PACK_SIZE, 0);
+		bufflen = recv(sniffer, buffer, PACK_SIZE, 0);
 		if (bufflen < 0)
 		{
-			WriteData("Recv error at get packets: %d.\n", WSAGetLastError());
+			printf("Recv error at get packets: %d.\n", WSAGetLastError());
 			result = -1;
 			goto End;
 		}
 
 		ProcessPacket(buffer, bufflen);
-
-		if (kbhit()) break;
 	}
 
 	closesocket(sniffer);
@@ -71,6 +69,7 @@ void ProcessUDP(octet *buff, int len)
 
 	PACK_START(type);
 	WriteIPv4Hdr(iphdr);
+	WriteUdpHdr(udphdr);
 
 	fprintf(pFile, "|- Data:\n");
 	WriteLongData(IP_DATA_START(buff) + sizeof(UDP_HDR), len - sizeof(UDP_HDR) - iphdr->hdrLen * 4);

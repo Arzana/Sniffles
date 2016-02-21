@@ -1,0 +1,86 @@
+Sun Feb 21 18:02:50 2016
+
+***********************Started sniffing***********************
+--------------------UDP--------------------
+IP Header
+|- IP Version: 4
+|- IP Header Length: 20 Octets
+|- Type of Service: 0
+|- IP Total Length: 160 Octets(Size of packet)
+|- Identifier: 20952
+|- Don't Fragment: True
+|- More Fragment: False
+|- Time to Live: 120
+|- Protocol: 17
+|- Checksum: 54929
+|- Source IP: 162.254.196.42
+|- Destination IP: 192.168.178.17
+UDP Header
+|- Source Port: 27018
+|- Destination Port: 55418
+|- Checksum: 45867
+|- Packet Size: 140 Octets
+|- Data:
+ 56 53 30 31 60 00 06 04 00 bc 92 5e 00 02 00 00          	VS01`......^....
+ f9 01 00 00 95 02 00 00 01 00 00 00 f9 01 00 00          	................
+ 60 00 00 00 39 b1 0f dd 42 85 be 21 94 93 a2 af          	`...9...B..!....
+ e8 43 6f c0 a7 4b f6 ad 35 04 0f eb ce 27 f3 ad          	.Co..K..5....'..
+ ef 5e 97 e7 19 20 7b 83 0b d1 c6 f7 4e 29 1a 04          	.^... {.....N)..
+ ce 03 86 84 5a 6a d7 b7 63 5d 26 d7 bb 0e 61 e3          	....Zj..c]&...a.
+ 36 a9 21 c7 30 fd 95 60 0a 2a d0 97 e9 c2 9a 35          	6.!.0..`.*.....5
+ 94 16 b8 d5 c8 92 e2 41 6e ab b5 59 15 e8 5b 1b          	.......An..Y..[.
+ d4 06 e6 cf                                              	....
+
+--------------------UDP--------------------
+IP Header
+|- IP Version: 4
+|- IP Header Length: 20 Octets
+|- Type of Service: 0
+|- IP Total Length: 64 Octets(Size of packet)
+|- Identifier: 5939
+|- Don't Fragment: False
+|- More Fragment: False
+|- Time to Live: 128
+|- Protocol: 17
+|- Checksum: 0
+|- Source IP: 192.168.178.17
+|- Destination IP: 162.254.196.42
+UDP Header
+|- Source Port: 55418
+|- Destination Port: 27018
+|- Checksum: 55840
+|- Packet Size: 44 Octets
+|- Data:
+ 56 53 30 31 00 00 07 04 00 02 00 00 00 bc 92 5e          	VS01...........^
+ 00 00 00 00 f9 01 00 00 00 00 00 00 00 00 00 00          	................
+ 00 00 00 00                                              	....
+
+--------------------UDP--------------------
+IP Header
+|- IP Version: 4
+|- IP Header Length: 20 Octets
+|- Type of Service: 0
+|- IP Total Length: 112 Octets(Size of packet)
+|- Identifier: 5940
+|- Don't Fragment: False
+|- More Fragment: False
+|- Time to Live: 128
+|- Protocol: 17
+|- Checksum: 0
+|- Source IP: 192.168.178.17
+|- Destination IP: 162.254.196.42
+UDP Header
+|- Source Port: 55418
+|- Destination Port: 27018
+|- Checksum: 55888
+|- Packet Size: 92 Octets
+|- Data:
+ 56 53 30 31 30 00 07 04 00 02 00 00 00 bc 92 5e          	VS010..........^
+ 00 00 00 00 f9 01 00 00 01 00 00 00 00 00 00 00          	................
+ 30 00 00 00 a9 70 ff 4f ee 5e 08 a9 df 6b 54 b7          	0....p.O.^...kT.
+ 91 f6 c6 40 e8 87 a9 05 b4 6e b5 c0 13 d6 49 07          	...@.....n....I.
+ 74 98 f3 87 43 3d 05 6c 6b 83 20 6e 91 26 09 d0          	t...C=.lk. n.&..
+ c6 da d0 5b                                              	...[
+
+
+***********************Finished***********************

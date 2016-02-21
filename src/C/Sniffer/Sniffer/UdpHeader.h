@@ -9,3 +9,5 @@ typedef struct UdpHdr
 	wyde octetLen;
 	wyde checksum;
 } UDP_HDR;
+
+void WriteUdpHdr(UDP_HDR*);

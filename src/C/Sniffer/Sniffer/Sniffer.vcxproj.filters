@@ -50,5 +50,8 @@
     <ClCompile Include="IpHeader.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="UdpHeader.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

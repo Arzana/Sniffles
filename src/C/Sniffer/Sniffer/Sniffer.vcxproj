@@ -31,6 +31,7 @@
     <ClCompile Include="IpHeader.c" />
     <ClCompile Include="Main.c" />
     <ClCompile Include="SockInit.c" />
+    <ClCompile Include="UdpHeader.c" />
     <ClCompile Include="Utils.c" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

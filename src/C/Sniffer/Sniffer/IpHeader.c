@@ -1,7 +1,7 @@
 #include "IpHeader.h"
 #include <WinSock2.h>
 
-#define LOG(x, y)	fprintf(pFile, x, y);
+#define LOG(x, y)	fprintf(pFile, x, y)
 #define STRBOOL(x)	((x) ? "True" : "False")
 
 void WriteIPv4Hdr(IPV4_HDR* hdr)

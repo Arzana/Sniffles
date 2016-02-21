@@ -136,7 +136,7 @@ int MakePromiscious(int in)
 		return 1;
 	}
 
-	printf("Socket set\n\n");
+	printf("Socket set\n");
 	return 0;
 }
 #endif
