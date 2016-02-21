@@ -42,19 +42,18 @@ End:
 void ProcessPacket(octet *buff, int len)
 {
 	IPV4_HDR *iphdr = buff;
-	WriteIPv4Hdr(iphdr);
 
 	switch (iphdr->proto)
 	{
 	case 1:		// ICMP
 	case 58:	// ICMP (IPv6)
-		ProcessICMP(buff);
+		ProcessICMP(buff, len);
 		break;
 	case 4:		// IP in IP
 		ProcessPacket(IP_DATA_START(buff), len);
 		break;
 	case 17:	// UDP
-		ProcessUDP(buff);
+		ProcessUDP(buff, len);
 		break;
 	default:
 		WriteData("%d\n", iphdr->proto);
@@ -62,15 +61,20 @@ void ProcessPacket(octet *buff, int len)
 	}
 }
 
-void ProcessUDP(octet *buff)
+void ProcessUDP(octet *buff, int len)
 {
+	IPV4_HDR *iphdr = buff;
 	UDP_HDR *udphdr = IP_DATA_START(buff);
 
-	if (ntohs(udphdr->destPort) == 53 || ntohs(udphdr->srcPort) == 53) WriteData("DNS (UDP)\n");
-	else WriteData("UDP\n");
+	PACK_START((ntohs(udphdr->destPort) == 53 || ntohs(udphdr->srcPort) == 53) ? "DNS (UDP)" : "UDP");
+	WriteIPv4Hdr(iphdr);
+
+	fprintf(pFile, "|- Data:\n");
+	WriteLongData(IP_DATA_START(buff) + sizeof(UDP_HDR), len - sizeof(UDP_HDR) - iphdr->hdrLen * 4);
+	PACK_END;
 }
 
-void ProcessICMP(octet *buff)
+void ProcessICMP(octet *buff, int len)
 {
 	ICMP_HDR *icmphdr = IP_DATA_START(buff);
 

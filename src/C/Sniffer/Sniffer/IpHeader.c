@@ -10,6 +10,7 @@ void WriteIPv4Hdr(IPV4_HDR* hdr)
 	src.sin_addr.s_addr = hdr->srcAddr;
 	dest.sin_addr.s_addr = hdr->destAddr;
 
+#ifdef FILE_LOG
 	fprintf(pFile, "\nIP Header\n");
 	LOG("|- IP Version: %u\n", hdr->version);
 	LOG("|- IP Header Length: %u Octets\n", hdr->hdrLen * 4);
@@ -23,4 +24,5 @@ void WriteIPv4Hdr(IPV4_HDR* hdr)
 	LOG("|- Checksum: %u\n", ntohs(hdr->checksum));
 	LOG("|- Source IP: %s\n", inet_ntoa(src.sin_addr));
 	LOG("|- Destination IP: %s\n", inet_ntoa(dest.sin_addr));
+#endif
 }

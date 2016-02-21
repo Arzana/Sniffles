@@ -8,5 +8,5 @@
 #define PACK_SIZE 65536
 
 void ProcessPacket(octet*, int);
-void ProcessUDP(octet*);
-void ProcessICMP(octet*);
+void ProcessUDP(octet*, int);
+void ProcessICMP(octet*, int);
