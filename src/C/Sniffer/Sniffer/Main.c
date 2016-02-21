@@ -50,11 +50,14 @@ void ProcessPacket(octet *buff, int len)
 	case 4:		// IP in IP
 		ProcessPacket(IP_DATA_START(buff), len);
 		break;
+	case 6:
+		printf("TCP");
+		break;
 	case 17:	// UDP
 		ProcessUDP(buff, len);
 		break;
 	default:
-		WriteData("%d\n", iphdr->proto);
+		printf("%d\n", iphdr->proto);
 		break;
 	}
 }
