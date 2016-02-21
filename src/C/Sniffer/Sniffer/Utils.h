@@ -5,8 +5,7 @@
 #define FILE_LOG
 #define PACK_START(proto)	fprintf(pFile, "--------------------"); \
 							fprintf(pFile, (proto)); \
-							fprintf(pFile, "--------------------")
-#define PACK_END			fprintf(pFile, "----------------------------------------")
+							fprintf(pFile, "--------------------\n")
 
 typedef unsigned char octet;
 typedef unsigned short wyde;

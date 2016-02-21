@@ -66,16 +66,19 @@ void ProcessUDP(octet *buff, int len)
 	IPV4_HDR *iphdr = buff;
 	UDP_HDR *udphdr = IP_DATA_START(buff);
 
-	PACK_START((ntohs(udphdr->destPort) == 53 || ntohs(udphdr->srcPort) == 53) ? "DNS (UDP)" : "UDP");
+	const char *type = IS_DNS(udphdr) ? "DNS (UDP)" : "UDP";
+	printf("%s\n", type);
+
+	PACK_START(type);
 	WriteIPv4Hdr(iphdr);
 
 	fprintf(pFile, "|- Data:\n");
 	WriteLongData(IP_DATA_START(buff) + sizeof(UDP_HDR), len - sizeof(UDP_HDR) - iphdr->hdrLen * 4);
-	PACK_END;
 }
 
 void ProcessICMP(octet *buff, int len)
 {
+	IPV4_HDR *iphdr = buff;
 	ICMP_HDR *icmphdr = IP_DATA_START(buff);
 
 	char *type;
@@ -187,5 +190,5 @@ void ProcessICMP(octet *buff, int len)
 		break;
 	}
 
-	WriteData("ICMP - %s\n", type);
+	WriteData("ICMP (IPv%d) - %s\n", iphdr->proto == 53 ? 6 : 4, type);
 }

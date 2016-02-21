@@ -11,7 +11,7 @@ void WriteIPv4Hdr(IPV4_HDR* hdr)
 	dest.sin_addr.s_addr = hdr->destAddr;
 
 #ifdef FILE_LOG
-	fprintf(pFile, "\nIP Header\n");
+	fprintf(pFile, "IP Header\n");
 	LOG("|- IP Version: %u\n", hdr->version);
 	LOG("|- IP Header Length: %u Octets\n", hdr->hdrLen * 4);
 	LOG("|- Type of Service: %u\n", hdr->tos);

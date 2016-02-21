@@ -18,7 +18,7 @@ void StartWriteData(void)
 	time(&rawTime);
 	timeInfo = localtime(&rawTime);
 
-	pFile = fopen("Log.txt", "a");
+	pFile = fopen("Log.txt", "w");
 	fprintf(pFile, "%s", asctime(timeInfo));
 }
 
@@ -51,7 +51,7 @@ void WriteLongData(const char *data, int size)
 				fprintf(pFile, "   ");
 			}
 
-			fprintf(pFile, "%s\n", line);
+			fprintf(pFile, "\t%s\n", line);
 		}
 	}
 
